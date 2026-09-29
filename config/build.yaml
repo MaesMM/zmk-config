@@ -1,0 +1,10 @@
+include:
+  - board: nice_nano_v2
+    shield: first_left
+    artifact-name: first_left-nice_nano_v2-zmk
+  - board: nice_nano_v2
+    shield: first_right
+    artifact-name: first_right-nice_nano_v2-zmk
+  - board: nice_nano_v2
+    shield: settings_reset
+    artifact-name: settings_reset-nice_nano_v2-zmk
