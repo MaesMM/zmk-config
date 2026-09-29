@@ -17,7 +17,7 @@ features:
   - studio  # Remove this line if your keyboard will not support ZMK Studio
 
 requires:
-  - pro_micro
+  - nice_nano_v2
 
 siblings:
   - first_left

@@ -1,0 +1,15 @@
+#include "first.dtsi"
+
+&default_transform {
+	col-offset = <6>;
+};
+
+&kscan {
+	col-gpios = <&pro_micro 0 GPIO_ACTIVE_HIGH> // PM 2
+		, <&pro_micro 5 GPIO_ACTIVE_HIGH> // PM 8
+		, <&pro_micro 6 GPIO_ACTIVE_HIGH> // PM 9
+		, <&pro_micro 7 GPIO_ACTIVE_HIGH> // PM 10
+		, <&pro_micro 8 GPIO_ACTIVE_HIGH> // PM 11
+		, <&pro_micro 9 GPIO_ACTIVE_HIGH> // PM 12
+		;
+};
