@@ -1,6 +1,48 @@
 name: Build ZMK firmware
+
 on: [push, pull_request, workflow_dispatch]
 
 jobs:
+  matrix:
+    runs-on: ubuntu-latest
+    name: Fetch build matrix
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v4
+      # Go-yq syntax: expression FIRST ('.'), file path AFTER.
+      - name: Read config/build.yaml
+        id: set-matrix
+        run: echo "matrix=$(yq -oj -I0 '.' config/build.yaml)" >> "$GITHUB_OUTPUT"
+
   build:
-    uses: zmkfirmware/zmk/.github/workflows/build-user-config.yml@v0.3
+    needs: matrix
+    runs-on: ubuntu-latest
+    container: zmkfirmware/zmk-dev-arm:3.5.0
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJson(needs.matrix.outputs.matrix) }}
+    name: ${{ matrix.artifact-name }}
+    steps:
+      - uses: actions/checkout@v4
+
+      # west init -l config  =>  config/ becomes the local west module,
+      # so Zephyr auto-discovers shields under config/boards/shields/.
+      - name: West setup
+        run: |
+          west init -l config
+          west update
+          west zephyr-export
+
+      - name: Build ${{ matrix.board }} + ${{ matrix.shield }}
+        run: |
+          west build -d "build/${{ matrix.artifact-name }}" \
+            -b "${{ matrix.board }}" \
+            --shield "${{ matrix.shield }}" \
+            -- -DZMK_CONFIG="${GITHUB_WORKSPACE}/config"
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact-name }}
+          path: build/${{ matrix.artifact-name }}/zephyr/zmk.uf2
